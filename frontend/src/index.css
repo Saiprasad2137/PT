@@ -736,3 +736,73 @@ p {
 .border-green-800 {
   border-color: #065f46;
 }
+
+/* --- Header --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 50;
+  background: transparent;
+}
+
+.header .logo a {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.header ul {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.header .nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.header .nav-btn:hover {
+  transform: translateY(-2px);
+}
+
+.header .nav-btn:first-child {
+  /* Login button */
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.header .nav-btn:first-child:hover {
+  border-color: #fff;
+}
+
+.header .nav-btn:last-child {
+  /* Register button */
+  background: var(--primary);
+  color: #000;
+  /* Dark text for contrast on cyan */
+  border: none;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+}
+
+.header .nav-btn:last-child:hover {
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6);
+}

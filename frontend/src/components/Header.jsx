@@ -13,10 +13,10 @@ function Header() {
 
     return (
         <header className='header'>
-            <div className='logo'>
-                <Link to='/'>ManageX</Link>
+            <div className='logo' style={{ display: 'flex', alignItems: 'center' }}>
+                <Link to='/'>Manage<span className='text-accent'>X</span></Link>
             </div>
-            <ul>
+            <ul style={{ marginLeft: 'auto', display: 'flex', gap: '20px' }}>
                 {user ? (
                     <li>
                         <button className='btn' onClick={onLogout}>
