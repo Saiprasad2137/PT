@@ -55,31 +55,31 @@ function FindTrainer() {
                             </div>
                             <div className="card-body">
                                 <p><FaEnvelope style={{ marginRight: '8px' }} /> {trainer.email}</p>
-                                <button
-                                    className="btn-primary"
-                                    style={{ marginTop: '1rem', width: '100%' }}
-                                    onClick={async () => {
-                                        const confirm = window.confirm(`Do you want to hire ${trainer.name}?`);
-                                        if (confirm) {
-                                            try {
-                                                const user = JSON.parse(localStorage.getItem('user'));
-                                                await userService.hireTrainer(trainer._id, user.token);
-                                                toast.success(`You have successfully hired ${trainer.name}!`);
-                                            } catch (error) {
-                                                toast.error('Failed to hire trainer. You may already have one.');
+                                <div className="trainer-actions">
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={async () => {
+                                            const confirm = window.confirm(`Do you want to hire ${trainer.name}?`);
+                                            if (confirm) {
+                                                try {
+                                                    const user = JSON.parse(localStorage.getItem('user'));
+                                                    await userService.hireTrainer(trainer._id, user.token);
+                                                    toast.success(`You have successfully hired ${trainer.name}!`);
+                                                } catch (error) {
+                                                    toast.error('Failed to hire trainer. You may already have one.');
+                                                }
                                             }
-                                        }
-                                    }}
-                                >
-                                    Hire Trainer
-                                </button>
-                                <button
-                                    className="btn-secondary"
-                                    style={{ marginTop: '0.5rem', width: '100%' }}
-                                    onClick={() => window.location.href = `mailto:${trainer.email}`}
-                                >
-                                    <FaEnvelope style={{ marginRight: '5px' }} /> Contact
-                                </button>
+                                        }}
+                                    >
+                                        Hire Trainer
+                                    </button>
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() => window.location.href = `mailto:${trainer.email}`}
+                                    >
+                                        <FaEnvelope /> Contact
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))
