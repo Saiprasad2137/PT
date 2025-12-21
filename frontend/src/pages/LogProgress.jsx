@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaSave, FaCalendarAlt, FaDumbbell, FaCheckSquare, FaSquare } from 'react-icons/fa';
+import { FaSave, FaCalendarAlt, FaDumbbell, FaCheckSquare, FaSquare, FaRegSquare, FaCheckCircle, FaArrowLeft, FaClock } from 'react-icons/fa';
 import workoutService from '../features/workoutService';
-import BackButton from '../components/BackButton';
 
 function LogProgress() {
     const [step, setStep] = useState(1); // 1 = Select Plan, 2 = Log Details
@@ -22,27 +21,35 @@ function LogProgress() {
     useEffect(() => {
         const fetchPlans = async () => {
             const user = JSON.parse(localStorage.getItem('user'));
-            if (user) {
-                try {
-                    const data = await workoutService.getPlans(user.token);
-                    setPlans(data);
-                } catch (error) {
-                    toast.error('Could not load workout plans');
-                }
+            if (!user) {
+                navigate('/login');
+                return;
+            }
+            try {
+                const data = await workoutService.getPlans(user.token);
+                setPlans(data);
+            } catch (error) {
+                toast.error('Could not load workout plans');
             }
         }
         fetchPlans();
-    }, []);
+    }, [navigate]);
 
     const handlePlanSelect = (plan) => {
         setSelectedPlan(plan);
-        // Initialize exercise logs based on plan
+        // Initialize exercise logs
         const initialLogs = plan.exercises.map(ex => ({
             name: ex.name,
-            setsCompleted: ex.sets, // Default to target sets
+            setsCompleted: ex.sets,
             isCompleted: false
         }));
         setExerciseLogs(initialLogs);
+        setStep(2);
+    };
+
+    const handleManualLog = () => {
+        setSelectedPlan(null);
+        setExerciseLogs([]);
         setStep(2);
     };
 
@@ -57,9 +64,7 @@ function LogProgress() {
         setIsLoading(true);
 
         const user = JSON.parse(localStorage.getItem('user'));
-
         if (!user || !user.token) {
-            toast.error('You must be logged in');
             navigate('/login');
             return;
         }
@@ -77,7 +82,7 @@ function LogProgress() {
             toast.success('Workout Logged Successfully!');
             navigate('/dashboard');
         } catch (error) {
-            const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+            const message = (error.response?.data?.message) || error.message;
             toast.error(message);
         } finally {
             setIsLoading(false);
@@ -85,127 +90,140 @@ function LogProgress() {
     };
 
     return (
-        <div className='dashboard-container'>
-            <BackButton url='/dashboard' />
+        <div className='container py-8 max-w-4xl mx-auto'>
+            {/* Header */}
+            <div className='mb-8 flex items-center gap-4'>
+                <button onClick={() => step === 2 ? setStep(1) : navigate('/dashboard')} className='btn btn-secondary p-2 rounded-full'>
+                    <FaArrowLeft />
+                </button>
+                <div>
+                    <h1 className='text-3xl font-bold'>Log Progress</h1>
+                    <p className='text-muted'>Track your training session</p>
+                </div>
+            </div>
 
-            <section className='heading'>
-                <h1>Log Workout Progress</h1>
-                <p>Track your sessions to see your improvement</p>
-            </section>
-
+            {/* Step 1: Select Plan */}
             {step === 1 && (
-                <div className='step-container' style={{ maxWidth: '800px', margin: '0 auto' }}>
-                    <h3 style={{ marginBottom: '1rem' }}>Select a Workout Plan to Log</h3>
-                    <div className='data-grid'>
+                <div className='animate-fadeIn'>
+                    <h2 className='text-xl font-bold mb-6'>What did you perform today?</h2>
+
+                    <div className='grid-responsive'>
+                        {/* Manual Log Card */}
+                        <div
+                            onClick={handleManualLog}
+                            className='card cursor-pointer hover:border-primary group text-center flex flex-col items-center justify-center p-8'
+                        >
+                            <div className='bg-gray-800 p-4 rounded-full mb-4 text-2xl text-muted group-hover:text-primary transition-colors'>
+                                <FaCalendarAlt />
+                            </div>
+                            <h3 className='font-bold text-lg'>Free Workout</h3>
+                            <p className='text-sm text-muted mt-2'>Log a session without a specific plan</p>
+                        </div>
+
+                        {/* Existing Plans */}
                         {plans.map(plan => (
-                            <div key={plan._id} className='data-card' onClick={() => handlePlanSelect(plan)} style={{ cursor: 'pointer' }}>
-                                <div className='card-header'>
-                                    <div className='icon-wrapper'><FaDumbbell /></div>
-                                    <h3>{plan.title}</h3>
+                            <div
+                                key={plan._id}
+                                onClick={() => handlePlanSelect(plan)}
+                                className='card cursor-pointer hover:border-secondary group'
+                            >
+                                <div className='flex items-center gap-4 mb-4'>
+                                    <div className='bg-blue-500 bg-opacity-10 p-3 rounded-lg text-blue-400'>
+                                        <FaDumbbell />
+                                    </div>
+                                    <div>
+                                        <h3 className='font-bold'>{plan.title}</h3>
+                                        <span className='badge badge-primary mt-1'>{plan.targetMuscleGroup}</span>
+                                    </div>
                                 </div>
-                                <div className='card-body'>
-                                    <p><strong>Target:</strong> {plan.targetMuscleGroup}</p>
-                                    <p>{plan.exercises.length} Exercises</p>
-                                    <button className="btn-secondary" style={{ width: '100%', marginTop: '10px' }}>Log this Workout</button>
+                                <div className='text-sm text-muted'>
+                                    {plan.exercises.length} Exercises defined
                                 </div>
                             </div>
                         ))}
-                        <div className='data-card' onClick={() => { setSelectedPlan(null); setExerciseLogs([]); setStep(2); }} style={{ cursor: 'pointer', border: '2px dashed rgba(255,255,255,0.2)' }}>
-                            <div className='card-header'>
-                                <div className='icon-wrapper'><FaCalendarAlt /></div>
-                                <h3>Free Workout</h3>
-                            </div>
-                            <div className='card-body'>
-                                <p>Log a workout without a plan</p>
-                                <button className="btn-secondary" style={{ width: '100%', marginTop: '10px' }}>Log Manual</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             )}
 
+            {/* Step 2: Log Details */}
             {step === 2 && (
-                <section className='form' style={{ maxWidth: '600px', margin: '0 auto' }}>
-                    <form onSubmit={onSubmit}>
-                        {selectedPlan && (
-                            <div className="plan-summary" style={{ marginBottom: '20px', padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px' }}>
-                                <h3>{selectedPlan.title}</h3>
-                                <p className="text-sm">Target: {selectedPlan.targetMuscleGroup}</p>
+                <form onSubmit={onSubmit} className='animate-fadeIn max-w-2xl mx-auto'>
 
-                                <h4 style={{ marginTop: '15px', marginBottom: '10px' }}>Exercises</h4>
+                    {/* Selected Plan Summary */}
+                    {selectedPlan && (
+                        <div className='card mb-8 border-primary bg-primary bg-opacity-5'>
+                            <h3 className='font-bold text-lg mb-4 flex items-center gap-2'>
+                                <FaCheckCircle className='text-primary' /> {selectedPlan.title}
+                            </h3>
+
+                            <div className='space-y-2'>
                                 {exerciseLogs.map((ex, index) => (
-                                    <div key={index} className="exercise-check-item"
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            padding: '10px',
-                                            marginBottom: '5px',
-                                            background: ex.isCompleted ? 'rgba(77, 255, 148, 0.1)' : 'transparent',
-                                            borderRadius: '5px',
-                                            cursor: 'pointer'
-                                        }}
+                                    <div
+                                        key={index}
                                         onClick={() => toggleExercise(index)}
+                                        className={`p-3 rounded-lg flex items-center justify-between cursor-pointer transition-all ${ex.isCompleted ? 'bg-green-900 bg-opacity-20 border border-green-800' : 'bg-gray-800 border border-transparent hover:border-gray-600'
+                                            }`}
                                     >
-                                        <span>{ex.name} ({ex.setsCompleted} sets)</span>
-                                        {ex.isCompleted ? <FaCheckSquare color="#4dff94" size={24} /> : <FaSquare color="rgba(255,255,255,0.3)" size={24} />}
+                                        <span className={ex.isCompleted ? 'text-white' : 'text-muted'}>
+                                            {ex.name} <span className='text-xs opacity-60 ml-1'>({ex.setsCompleted} sets)</span>
+                                        </span>
+                                        {ex.isCompleted ? <FaCheckSquare className='text-success text-xl' /> : <FaRegSquare className='text-muted text-xl' />}
                                     </div>
                                 ))}
                             </div>
-                        )}
+                        </div>
+                    )}
 
-                        <div className='form-group'>
-                            <label>Date</label>
-                            <div className="input-wrapper">
-                                <FaCalendarAlt className="icon" />
-                                <input
-                                    type='date'
-                                    className='form-control'
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    required
-                                />
+                    <div className='card space-y-6'>
+                        <div className='grid-2'>
+                            <div className='input-group mb-0'>
+                                <label className='input-label'>Date</label>
+                                <div className='relative'>
+                                    <span className='absolute left-4 top-3.5 text-muted'><FaCalendarAlt /></span>
+                                    <input
+                                        type='date'
+                                        className='form-input pl-11'
+                                        value={date}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className='input-group mb-0'>
+                                <label className='input-label'>Duration (min)</label>
+                                <div className='relative'>
+                                    <span className='absolute left-4 top-3.5 text-muted'><FaClock /></span>
+                                    <input
+                                        type='number'
+                                        className='form-input pl-11'
+                                        value={duration}
+                                        onChange={(e) => setDuration(e.target.value)}
+                                        placeholder='e.g. 60'
+                                        required
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <div className='form-group'>
-                            <label>Duration (minutes)</label>
-                            <div className="input-wrapper">
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={duration}
-                                    onChange={(e) => setDuration(e.target.value)}
-                                    placeholder="e.g. 45"
-                                    required
-                                />
-                            </div>
+                        <div className='input-group mb-0'>
+                            <label className='input-label'>Session Notes</label>
+                            <textarea
+                                className='form-input'
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                placeholder='How did the workout feel?'
+                                rows='3'
+                                required
+                            />
                         </div>
 
-                        <div className='form-group'>
-                            <label>Session Details</label>
-                            <div className="input-wrapper">
-                                <textarea
-                                    className='form-control'
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="How did it feel? Weights used?"
-                                    rows="5"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className='form-group'>
-                            <button type='button' className='btn btn-video' onClick={() => setStep(1)} style={{ marginRight: '10px', background: 'transparent', border: '1px solid rgba(255,255,255,0.3)' }}>
-                                Change Plan
+                        <div className='pt-4'>
+                            <button type='submit' className='btn btn-primary w-full text-lg py-4' disabled={isLoading}>
+                                {isLoading ? <div className='spinner'></div> : <><FaSave /> Save Log</>}
                             </button>
-                            <button type='submit' className='btn btn-block' disabled={isLoading} style={{ width: 'auto', flex: 1 }}>
-                                {isLoading ? (<><div className="spinner"></div> Saving...</>) : (<><FaSave /> Save Workout Log</>)}
-                            </button>
                         </div>
-                    </form>
-                </section>
+                    </div>
+                </form>
             )}
         </div>
     );

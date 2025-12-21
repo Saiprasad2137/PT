@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaUser, FaEnvelope, FaLock, FaUserPlus, FaIdCard } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaUserPlus, FaIdCard, FaRunning } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import authService from '../features/authService';
@@ -48,12 +48,7 @@ function Register() {
             await authService.register(userData);
             navigate('/dashboard');
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = (error.response?.data?.message) || error.message || error.toString();
             toast.error(message);
         } finally {
             setIsLoading(false);
@@ -61,140 +56,131 @@ function Register() {
     };
 
     return (
-        <div className='login-page-wrapper'>
-            <h1 className='main-title'>Personal Training Management System</h1>
-            <div className='login-container'>
-                <section className='header'>
-                    <h1>
-                        <FaUserPlus style={{ marginRight: '10px' }} /> Register
-                    </h1>
-                    <p>Create your ManageX account</p>
-                </section>
+        <div className='flex flex-col items-center justify-center min-h-[80vh] w-full max-w-md mx-auto py-12'>
+            <div className='text-center mb-8 animate-fadeIn'>
+                <h1 className='text-3xl font-bold mb-2'>
+                    Join <span className='text-gradient'>ManageX</span>
+                </h1>
+                <p className='text-muted'>Start your fitness journey today</p>
+            </div>
 
-                <section className='form'>
-                    <form onSubmit={onSubmit}>
-                        <div className='form-group'>
-                            <div className='input-wrapper'>
-                                <span className='input-icon'>
-                                    <FaUser />
-                                </span>
-                                <input
-                                    type='text'
-                                    className='form-control'
-                                    id='name'
-                                    name='name'
-                                    value={name}
-                                    placeholder='Enter your name'
-                                    onChange={onChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className='form-group'>
-                            <div className='input-wrapper'>
-                                <span className='input-icon'>
-                                    <FaEnvelope />
-                                </span>
-                                <input
-                                    type='email'
-                                    className='form-control'
-                                    id='email'
-                                    name='email'
-                                    value={email}
-                                    placeholder='Enter your email'
-                                    onChange={onChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className='form-group'>
-                            <div className='input-wrapper'>
-                                <span className='input-icon'>
-                                    <FaLock />
-                                </span>
-                                <input
-                                    type='password'
-                                    className='form-control'
-                                    id='password'
-                                    name='password'
-                                    value={password}
-                                    placeholder='Enter password'
-                                    onChange={onChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className='form-group'>
-                            <div className='input-wrapper'>
-                                <span className='input-icon'>
-                                    <FaIdCard />
-                                </span>
-                                <select
-                                    name="role"
-                                    id="role"
-                                    value={role}
-                                    onChange={onChange}
-                                    className='form-control'
-                                    style={{ appearance: 'auto' }}
-                                >
-                                    <option value="client">Client</option>
-                                    <option value="trainer">Trainer</option>
-                                </select>
-                            </div>
-                        </div>
+            <div className='card w-full animate-fadeIn'>
+                <div className='text-center mb-6'>
+                    <div className='inline-flex p-4 rounded-full bg-gray-800 text-primary text-2xl mb-4 shadow-lg border border-gray-700'>
+                        <FaUserPlus />
+                    </div>
+                </div>
 
-                        {role === 'trainer' && (
-                            <>
-                                <div className='form-group'>
-                                    <div className='input-wrapper'>
-                                        <span className='input-icon'>
-                                            <FaIdCard />
-                                        </span>
-                                        <input
-                                            type='text'
-                                            className='form-control'
-                                            id='specialization'
-                                            name='specialization'
-                                            value={formData.specialization}
-                                            placeholder='Specialization (e.g. Yoga)'
-                                            onChange={onChange}
-                                            required
-                                        />
-                                    </div>
+                <form onSubmit={onSubmit} className='flex flex-col gap-4'>
+                    <div className='input-group mb-0'>
+                        <label className='input-label'>Full Name</label>
+                        <div className='relative'>
+                            <span className='absolute left-4 top-3.5 text-muted'><FaUser /></span>
+                            <input
+                                type='text'
+                                className='form-input pl-11'
+                                name='name'
+                                value={name}
+                                placeholder='John Doe'
+                                onChange={onChange}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className='input-group mb-0'>
+                        <label className='input-label'>Email Address</label>
+                        <div className='relative'>
+                            <span className='absolute left-4 top-3.5 text-muted'><FaEnvelope /></span>
+                            <input
+                                type='email'
+                                className='form-input pl-11'
+                                name='email'
+                                value={email}
+                                placeholder='john@example.com'
+                                onChange={onChange}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className='input-group mb-0'>
+                        <label className='input-label'>Password</label>
+                        <div className='relative'>
+                            <span className='absolute left-4 top-3.5 text-muted'><FaLock /></span>
+                            <input
+                                type='password'
+                                className='form-input pl-11'
+                                name='password'
+                                value={password}
+                                placeholder='Min 6 characters'
+                                onChange={onChange}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className='input-group mb-0'>
+                        <label className='input-label'>I am a...</label>
+                        <div className='grid-2 gap-4'>
+                            <label className={`cursor-pointer p-3 rounded-lg border flex flex-col items-center gap-2 transition-all ${role === 'client' ? 'border-primary bg-cyan-500 bg-opacity-10 text-primary' : 'border-gray-700 hover:bg-gray-800'}`}>
+                                <input type='radio' name='role' value='client' checked={role === 'client'} onChange={onChange} className='hidden' />
+                                <FaUser /> Client
+                            </label>
+                            <label className={`cursor-pointer p-3 rounded-lg border flex flex-col items-center gap-2 transition-all ${role === 'trainer' ? 'border-primary bg-cyan-500 bg-opacity-10 text-primary' : 'border-gray-700 hover:bg-gray-800'}`}>
+                                <input type='radio' name='role' value='trainer' checked={role === 'trainer'} onChange={onChange} className='hidden' />
+                                <FaRunning /> Trainer
+                            </label>
+                        </div>
+                    </div>
+
+                    {role === 'trainer' && (
+                        <div className='animate-fadeIn flex flex-col gap-4 p-4 rounded-lg bg-gray-800 border border-gray-700'>
+                            <div className='input-group mb-0'>
+                                <label className='input-label'>Specialization</label>
+                                <div className='relative'>
+                                    <span className='absolute left-4 top-3.5 text-muted'><FaIdCard /></span>
+                                    <input
+                                        type='text'
+                                        className='form-input pl-11'
+                                        name='specialization'
+                                        value={specialization}
+                                        placeholder='e.g. Yoga, HIIT'
+                                        onChange={onChange}
+                                        required
+                                    />
                                 </div>
-                                <div className='form-group'>
-                                    <div className='input-wrapper'>
-                                        <span className='input-icon'>
-                                            <FaIdCard />
-                                        </span>
-                                        <input
-                                            type='text'
-                                            className='form-control'
-                                            id='experience'
-                                            name='experience'
-                                            value={formData.experience}
-                                            placeholder='Experience (e.g. 5 years)'
-                                            onChange={onChange}
-                                            required
-                                        />
-                                    </div>
+                            </div>
+                            <div className='input-group mb-0'>
+                                <label className='input-label'>Years Experience</label>
+                                <div className='relative'>
+                                    <span className='absolute left-4 top-3.5 text-muted'><FaIdCard /></span>
+                                    <input
+                                        type='text'
+                                        className='form-input pl-11'
+                                        name='experience'
+                                        value={experience}
+                                        placeholder='e.g. 5 years'
+                                        onChange={onChange}
+                                        required
+                                    />
                                 </div>
-                            </>
-                        )}
-
-                        <div className='form-group'>
-                            <button type='submit' className='btn btn-block' disabled={isLoading}>
-                                {isLoading ? (
-                                    <>
-                                        <span className='loading-spinner'></span> Creating Account...
-                                    </>
-                                ) : (
-                                    'Register'
-                                )}
-                            </button>
+                            </div>
                         </div>
-                    </form>
-                </section>
+                    )}
+
+                    <div className='mt-6'>
+                        <button type='submit' className='btn btn-primary w-full' disabled={isLoading}>
+                            {isLoading ? <div className='spinner'></div> : 'Create Account'}
+                        </button>
+                    </div>
+
+                    <div className='text-center mt-4'>
+                        <p className='text-sm text-muted'>
+                            Already have an account? <span className='text-primary cursor-pointer hover:underline' onClick={() => navigate('/login')}>Sign In</span>
+                        </p>
+                    </div>
+                </form>
             </div>
         </div>
     );

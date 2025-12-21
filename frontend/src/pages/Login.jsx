@@ -17,11 +17,7 @@ function Login() {
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
-            if (user.isAdmin) {
-                navigate('/admin');
-            } else {
-                navigate('/dashboard');
-            }
+            navigate(user.isAdmin ? '/admin' : '/dashboard');
         }
     }, [navigate]);
 
@@ -39,18 +35,10 @@ function Login() {
         try {
             const userData = { email, password };
             const user = await authService.login(userData);
-            if (user.isAdmin) {
-                navigate('/admin');
-            } else {
-                navigate('/dashboard');
-            }
+            toast.success(`Welcome back, ${user.name}!`);
+            navigate(user.isAdmin ? '/admin' : '/dashboard');
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = (error.response?.data?.message) || error.message || error.toString();
             toast.error(message);
         } finally {
             setIsLoading(false);
@@ -58,66 +46,73 @@ function Login() {
     };
 
     return (
-        <div className='login-page-wrapper'>
-            <h1 className='main-title'>Personal Training Management System</h1>
-            <div className='login-container'>
-                <section className='header'>
-                    <h1>
-                        <FaSignInAlt style={{ marginRight: '10px' }} /> Login
-                    </h1>
-                    <p>Welcome back! Please login to your account</p>
-                </section>
+        <div className='flex flex-col items-center justify-center min-h-[80vh] w-full max-w-md mx-auto'>
 
-                <section className='form'>
-                    <form onSubmit={onSubmit}>
-                        <div className='form-group'>
-                            <div className='input-wrapper'>
-                                <span className='input-icon'>
-                                    <FaUser />
-                                </span>
-                                <input
-                                    type='email'
-                                    className='form-control'
-                                    id='email'
-                                    name='email'
-                                    value={email}
-                                    placeholder='Enter your email'
-                                    onChange={onChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className='form-group'>
-                            <div className='input-wrapper'>
-                                <span className='input-icon'>
-                                    <FaLock />
-                                </span>
-                                <input
-                                    type='password'
-                                    className='form-control'
-                                    id='password'
-                                    name='password'
-                                    value={password}
-                                    placeholder='Enter password'
-                                    onChange={onChange}
-                                    required
-                                />
-                            </div>
-                        </div>
+            <div className='text-center mb-8 animate-fadeIn'>
+                <h1 className='text-3xl font-bold mb-2'>
+                    Welcome <span className='text-gradient'>Back</span>
+                </h1>
+                <p className='text-muted'>Sign in to continue your journey</p>
+            </div>
 
-                        <div className='form-group'>
-                            <button type='submit' className='btn btn-block' disabled={isLoading}>
-                                {isLoading ? (
-                                    <>
-                                        <span className='loading-spinner'></span> Processing...
-                                    </>
-                                ) : (
-                                    'Sign In'
-                                )}
-                            </button>
+            <div className='card w-full animate-fadeIn'>
+                <div className='text-center mb-6'>
+                    <div className='inline-flex p-4 rounded-full bg-gray-800 text-primary text-2xl mb-4 shadow-lg border border-gray-700'>
+                        <FaSignInAlt />
+                    </div>
+                </div>
+
+                <form onSubmit={onSubmit}>
+                    <div className='input-group'>
+                        <label className='input-label'>Email Address</label>
+                        <div className='relative'>
+                            <span className='absolute left-4 top-3.5 text-muted'>
+                                <FaUser />
+                            </span>
+                            <input
+                                type='email'
+                                className='form-input pl-11'
+                                id='email'
+                                name='email'
+                                value={email}
+                                placeholder='Enter your email'
+                                onChange={onChange}
+                                required
+                            />
                         </div>
-                    </form>
-                </section>
+                    </div>
+
+                    <div className='input-group'>
+                        <label className='input-label'>Password</label>
+                        <div className='relative'>
+                            <span className='absolute left-4 top-3.5 text-muted'>
+                                <FaLock />
+                            </span>
+                            <input
+                                type='password'
+                                className='form-input pl-11'
+                                id='password'
+                                name='password'
+                                value={password}
+                                placeholder='Enter password'
+                                onChange={onChange}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className='mt-8'>
+                        <button type='submit' className='btn btn-primary w-full' disabled={isLoading}>
+                            {isLoading ? <div className='spinner'></div> : 'Sign In'}
+                        </button>
+                    </div>
+
+                    <div className='text-center mt-6'>
+                        <p className='text-sm text-muted'>
+                            Don't have an account? <span className='text-primary cursor-pointer hover:underline' onClick={() => navigate('/register')}>Register</span>
+                        </p>
+                    </div>
+                </form>
             </div>
         </div>
     );

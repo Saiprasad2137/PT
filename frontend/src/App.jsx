@@ -11,14 +11,13 @@ import MyClients from './pages/MyClients';
 import FindTrainer from './pages/FindTrainer';
 import AdminDashboard from './pages/AdminDashboard';
 import WorkoutHistory from './pages/WorkoutHistory';
-import Header from './components/Header';
+import Layout from './components/Layout';
 
 function App() {
   return (
     <>
       <Router>
-        <div className='container'>
-          <Header />
+        <Layout>
           <Routes>
             <Route path='/' element={<Dashboard />} />
             <Route path='/dashboard' element={<Dashboard />} />
@@ -32,7 +31,7 @@ function App() {
             <Route path='/find-trainer' element={<FindTrainer />} />
             <Route path='/history' element={<WorkoutHistory />} />
           </Routes>
-        </div>
+        </Layout>
       </Router>
       <ToastContainer />
     </>
