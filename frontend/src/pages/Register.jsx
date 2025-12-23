@@ -41,6 +41,14 @@ function Register() {
             return;
         }
 
+        const trimmedEmail = email.trim();
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmedEmail)) {
+            toast.error('Please enter a valid email address');
+            return;
+        }
+
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/;
         if (!passwordRegex.test(password)) {
             toast.error('Password must contain at least one uppercase letter, one lowercase letter, and one special character');
@@ -50,7 +58,7 @@ function Register() {
         setIsLoading(true);
 
         try {
-            const userData = { name, email, password, role, specialization, experience };
+            const userData = { name, email: trimmedEmail, password, role, specialization, experience };
             await authService.register(userData);
             navigate('/dashboard');
         } catch (error) {
