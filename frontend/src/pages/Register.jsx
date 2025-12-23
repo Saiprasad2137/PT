@@ -41,6 +41,12 @@ function Register() {
             return;
         }
 
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/;
+        if (!passwordRegex.test(password)) {
+            toast.error('Password must contain at least one uppercase letter, one lowercase letter, and one special character');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
